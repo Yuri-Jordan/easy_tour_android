@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +44,9 @@ public class RoteirosFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
         View view = inflater.inflate( R.layout.fragment_roteiros, container, false);
+
         listView = (ListView) view.findViewById( R.id.listViewRoteiros);
 
         roteiroId = this.getArguments().getInt("roteirosId");
@@ -91,6 +94,7 @@ public class RoteirosFragment extends Fragment {
                         return textView;
                     }
                 };
+
                 listView.setAdapter(arrayAdapter);
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){

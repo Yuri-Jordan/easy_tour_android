@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +33,8 @@ import java.net.URL;
 
 public class CategoriaParceirosFragment extends Fragment {
 
+    private ProgressBar spinner;
+
     protected ListView listView;
     public String[] catParceirosNome;
     protected JSONArray categoriaParceiros;
@@ -42,17 +45,19 @@ public class CategoriaParceirosFragment extends Fragment {
                              Bundle savedInstanceState) {
 
 
+        View view = inflater.inflate( R.layout.fragment_categoria_parceiros, container, false);
+
+        spinner = (ProgressBar)view.findViewById(R.id.ventilator_progress);
+
+        // Acessando a listView pelo Id=listViewCatParceiros
+        listView = (ListView) view.findViewById( R.id.listViewCatParceiros);
 
         if(isInternetDisponivel()){
+            spinner.setVisibility(View.VISIBLE);
             new CategoriaParceirosTask().execute();
         }else{
             Toast.makeText(getActivity().getApplicationContext(), "Internet indisponível. Verifique sua conexão.", Toast.LENGTH_LONG).show();
         }
-
-        View view = inflater.inflate( R.layout.fragment_categoria_parceiros, container, false);
-
-        // Acessando a listView pelo Id=listViewCatParceiros
-        listView = (ListView) view.findViewById( R.id.listViewCatParceiros);
 
         return view;
 
@@ -95,6 +100,7 @@ public class CategoriaParceirosFragment extends Fragment {
                         return textView;
                     }
                 };
+                spinner.setVisibility(View.INVISIBLE);
                 // Vinculando a lista com as informações
                 listView.setAdapter(arrayAdapter);
 

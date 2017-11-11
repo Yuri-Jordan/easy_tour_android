@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,7 @@ import java.net.URL;
 
 public class CategoriaRoteirosFragment extends Fragment {
 
+    private ProgressBar spinner;
 
     protected ListView listView;
     protected String[] catRoteirosNome;
@@ -44,14 +46,17 @@ public class CategoriaRoteirosFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        View view = inflater.inflate( R.layout.fragment_categoria_roteiros, container, false);
+        spinner = (ProgressBar)view.findViewById(R.id.ventilator_progress);
+        listView = (ListView) view.findViewById( R.id.listViewCatRoteiros);
+
         if(isInternetDisponivel()){
+            spinner.setVisibility(View.VISIBLE);
             new CategoriaRoteirosTask().execute();
         }else{
             Toast.makeText(getActivity().getApplicationContext(), "Internet indisponível. Verifique sua conexão.", Toast.LENGTH_LONG).show();
         }
 
-        View view = inflater.inflate( R.layout.fragment_categoria_roteiros, container, false);
-        listView = (ListView) view.findViewById( R.id.listViewCatRoteiros);
 
         return view;
 
@@ -91,8 +96,9 @@ public class CategoriaRoteirosFragment extends Fragment {
                         return textView;
                     }
                 };
-                // Vinculando a lista com as informações
+                spinner.setVisibility(View.INVISIBLE);
 
+                // Vinculando a lista com as informações
                 listView.setAdapter(arrayAdapter);
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){

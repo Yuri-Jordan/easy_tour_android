@@ -73,7 +73,6 @@ public class ParceirosFragment extends Fragment {
                         return textView;
                     }
                 };
-
                 listView.setAdapter(arrayAdapter);
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
