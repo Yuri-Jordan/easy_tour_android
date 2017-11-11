@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_easy_tour_brasil"
+        android:orderInCategory="100"
+        android:title="Easy Tour Brasil"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_quero_ser_parceiro"
+        android:orderInCategory="100"
+        android:title="Quero ser Parceiro!"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_contato"
+        android:orderInCategory="100"
+        android:title="Contato"
+        app:showAsAction="never" />
+
+</menu>

@@ -1,0 +1,37 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#e9ebdf"
+    tools:context="com.example.cris.easytourbrasil.AlterarPerfilFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:orientation="vertical" >
+
+        <ImageView
+            android:layout_width="220dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/logo_easy_tour_brasil"/>
+
+        <com.uncopt.android.widget.text.justify.JustifiedTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textSize="17sp"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:textColor="#4a6112"
+            android:text="Queremos ajudar a divulgar o seu negócio! As soluções de tecnologia do Easy Tour Brasil são mais inovadoras do que qualquer canal de divulgação tradicional. Em pouco tempo você conquista novos clientes, aumenta suas vendas e ainda tem ferramentas para otimizar sua operação e fidelizar clientes." />
+
+
+    </LinearLayout>
+
+
+</FrameLayout>

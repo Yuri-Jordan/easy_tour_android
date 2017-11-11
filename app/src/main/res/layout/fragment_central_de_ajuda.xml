@@ -1,0 +1,30 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#e9ebdf"
+    tools:context="com.example.cris.easytourbrasil.AlterarPerfilFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="17dp"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="10dp"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#005382"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:text="Central de Ajuda" />
+
+    </LinearLayout>
+
+</FrameLayout>

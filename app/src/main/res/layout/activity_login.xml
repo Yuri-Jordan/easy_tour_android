@@ -1,0 +1,121 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_login"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:background="@drawable/bg_principal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="40dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:src="@drawable/logo_easy_tour_brasil"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="40dp"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#005382"
+            android:textStyle="bold"
+            android:text="Login"  />
+
+        <EditText
+            android:id="@+id/tLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#7a9f1f"
+            android:inputType="text"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#005382"
+            android:textStyle="bold"
+            android:text="Senha"  />
+
+        <EditText
+            android:id="@+id/tSenha"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#7a9f1f"
+            android:inputType="textPassword" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="33dp">
+
+        <Button
+            android:id="@+id/btLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/button_acessar"
+            android:text="Acessar"
+            android:textColor="#ffffff" />
+
+        <!--<Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_acessar_facebook"
+            android:text="ACESSAR PELO FACEBOOK"
+            android:textColor="#ffffff" />-->
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/signInButton"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent" />
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#005382"
+            android:text="Não tem uma conta? Crie uma!"  />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#005382"
+            android:text="Esqueceu sua senha?"  />
+
+    </LinearLayout>
+
+
+</LinearLayout>

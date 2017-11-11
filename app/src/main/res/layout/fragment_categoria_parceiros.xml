@@ -1,0 +1,25 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.cris.easytourbrasil.CategoriaParceirosFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:orientation="vertical"
+        android:background="#e9ebdf" >
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/listViewCatParceiros"
+            android:background="@android:color/transparent"
+            android:cacheColorHint="@android:color/transparent"
+            android:listSelector="@android:color/transparent"/>
+
+    </LinearLayout>
+
+</FrameLayout>

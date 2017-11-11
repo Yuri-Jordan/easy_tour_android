@@ -1,0 +1,138 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#e9ebdf"
+    tools:context="com.example.cris.easytourbrasil.AlterarPerfilFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:orientation="vertical" >
+
+        <ImageView
+            android:layout_width="220dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/logo_easy_tour_brasil"/>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:textColor="#4a6112"
+            android:textAlignment="center"
+            android:text="Juscelino Messias" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp"
+            android:textColor="#4a6112"
+            android:textAlignment="center"
+            android:text="CEO" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:textColor="#4a6112"
+            android:textAlignment="center"
+            android:text="Ricardo Luis" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp"
+            android:textColor="#4a6112"
+            android:textAlignment="center"
+            android:text="CIO" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:textColor="#4a6112"
+            android:textAlignment="center"
+            android:text="Hugo Pablo" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp"
+            android:textColor="#4a6112"
+            android:textAlignment="center"
+            android:text="Developer" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:textColor="#4a6112"
+            android:textAlignment="center"
+            android:text="Thomas Nogueira" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp"
+            android:textColor="#4a6112"
+            android:textAlignment="center"
+            android:text="Developer" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:textColor="#4a6112"
+            android:textAlignment="center"
+            android:text="Yuri Jordan" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp"
+            android:textColor="#4a6112"
+            android:textAlignment="center"
+            android:paddingBottom="5dp"
+            android:text="Developer" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:textColor="#4a6112"
+            android:textAlignment="center"
+            android:text="http://www.easytourbrasil.com.br/" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textSize="17sp"
+            android:textColor="#4a6112"
+            android:textAlignment="center"
+            android:text="easytourbrasil.rn@gmail.com" />
+
+
+    </LinearLayout>
+
+
+</FrameLayout>
