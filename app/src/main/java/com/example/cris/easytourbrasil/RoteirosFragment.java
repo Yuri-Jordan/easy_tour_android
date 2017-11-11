@@ -1,6 +1,8 @@
 package com.example.cris.easytourbrasil;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -79,7 +82,15 @@ public class RoteirosFragment extends Fragment {
                     roteirosNome[i] = atributo;
                 }
 
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, roteirosNome);
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, roteirosNome){
+                    @SuppressLint("ResourceAsColor")
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        TextView textView = (TextView) super.getView(position, convertView, parent);
+                        textView.setTextColor( Color.parseColor("#4a6112"));
+                        return textView;
+                    }
+                };
                 listView.setAdapter(arrayAdapter);
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){

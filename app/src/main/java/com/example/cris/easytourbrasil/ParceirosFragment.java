@@ -1,5 +1,7 @@
 package com.example.cris.easytourbrasil;
 
+import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -9,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -61,7 +64,16 @@ public class ParceirosFragment extends Fragment {
                     parceirosNome[i] = atributo;
                 }
 
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, parceirosNome);
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, parceirosNome){
+                    @SuppressLint("ResourceAsColor")
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        TextView textView = (TextView) super.getView(position, convertView, parent);
+                        textView.setTextColor( Color.parseColor("#4a6112"));
+                        return textView;
+                    }
+                };
+
                 listView.setAdapter(arrayAdapter);
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
