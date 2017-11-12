@@ -1,4 +1,4 @@
-package com.example.cris.easytourbrasil;
+package com.example.cris.easytourbrasil.roteiro;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,9 +15,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.cris.easytourbrasil.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,36 +32,34 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+public class RoteirosFragment extends Fragment {
 
-public class CategoriaRoteirosFragment extends Fragment {
-
-    private ProgressBar spinner;
 
     protected ListView listView;
-    protected String[] catRoteirosNome;
-    protected JSONArray categoriaRoteiros;
-    public static final String TAG = CategoriaRoteirosFragment.class.getSimpleName();
-
+    protected JSONArray roteiros;
+    protected String[] roteirosNome;
+    protected  int roteiroId;
+    public static final String TAG = RoteirosFragment.class.getSimpleName();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate( R.layout.fragment_categoria_roteiros, container, false);
-        spinner = (ProgressBar)view.findViewById(R.id.ventilator_progress);
-        listView = (ListView) view.findViewById( R.id.listViewCatRoteiros);
+
+        View view = inflater.inflate( R.layout.fragment_roteiros, container, false);
+
+        listView = (ListView) view.findViewById( R.id.listViewRoteiros);
+
+        roteiroId = this.getArguments().getInt("roteirosId");
 
         if(isInternetDisponivel()){
-            spinner.setVisibility(View.VISIBLE);
-            new CategoriaRoteirosTask().execute();
+            new RoteirosTask().execute();
         }else{
             Toast.makeText(getActivity().getApplicationContext(), "Internet indisponível. Verifique sua conexão.", Toast.LENGTH_LONG).show();
         }
 
-
+        // Inflate the layout for this fragment
         return view;
-
-
     }
 
     private boolean isInternetDisponivel() {
@@ -75,19 +74,19 @@ public class CategoriaRoteirosFragment extends Fragment {
     }
 
     private void atualizarLista() {
-        if(categoriaRoteiros == null){
-            Toast.makeText(getActivity().getApplicationContext(), "Nao existem categorias cadastradas.", Toast.LENGTH_LONG).show();
+        if(roteiros == null || roteiros.length() == 0){
+            Toast.makeText(getActivity().getApplicationContext(), "Nao existem roteiros para esta categoria.", Toast.LENGTH_LONG).show();
         }else{
             try {
-                catRoteirosNome =  new String[categoriaRoteiros.length()];
+                roteirosNome =  new String[roteiros.length()];
 
-                for(int i = 0; i < categoriaRoteiros.length(); i++){
-                    JSONObject objeto = categoriaRoteiros.getJSONObject(i);
+                for(int i = 0; i < roteiros.length(); i++){
+                    JSONObject objeto = roteiros.getJSONObject(i);
                     String atributo = objeto.getString("nome");
-                    catRoteirosNome[i] = atributo;
+                    roteirosNome[i] = atributo;
                 }
 
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, catRoteirosNome){
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, roteirosNome){
                     @SuppressLint("ResourceAsColor")
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
@@ -96,9 +95,7 @@ public class CategoriaRoteirosFragment extends Fragment {
                         return textView;
                     }
                 };
-                spinner.setVisibility(View.INVISIBLE);
 
-                // Vinculando a lista com as informações
                 listView.setAdapter(arrayAdapter);
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
@@ -107,11 +104,11 @@ public class CategoriaRoteirosFragment extends Fragment {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Bundle bundle = new Bundle();
                         try {
-                            bundle.putInt("roteirosId", categoriaRoteiros.getJSONObject(position).getInt("id"));
-                            RoteirosFragment rFragment = new RoteirosFragment();
-                            rFragment.setArguments(bundle);
+                            bundle.putInt("roteiroId", roteiros.getJSONObject(position).getInt("id"));
+                            RoteirosMapFragment rmFragment = new RoteirosMapFragment();
+                            rmFragment.setArguments(bundle);
                             getActivity().getSupportFragmentManager().beginTransaction()
-                                    .replace( R.id.container, rFragment)
+                                    .replace( R.id.container, rmFragment)
                                     .addToBackStack(null)
                                     .commit();
 
@@ -129,7 +126,8 @@ public class CategoriaRoteirosFragment extends Fragment {
         }
     }
 
-    private class CategoriaRoteirosTask extends AsyncTask<Object, Void, JSONArray> {
+
+    private class RoteirosTask extends AsyncTask<Object, Void, JSONArray> {
 
 
         @Override
@@ -139,7 +137,7 @@ public class CategoriaRoteirosFragment extends Fragment {
             JSONArray jsonArray = null;
 
             try{
-                URL apiCatParceirosURL = new URL("http://easy-tour-brasil-api.herokuapp.com/categorias");
+                URL apiCatParceirosURL = new URL("http://easy-tour-brasil-api.herokuapp.com/categorias/" + roteiroId + "/roteiros");
                 HttpURLConnection connection = (HttpURLConnection) apiCatParceirosURL.openConnection();
                 connection.connect();
 
@@ -175,8 +173,10 @@ public class CategoriaRoteirosFragment extends Fragment {
         }
         @Override
         protected void onPostExecute(JSONArray resultDoInBackground){
-            categoriaRoteiros = resultDoInBackground;
+            roteiros = resultDoInBackground;
             atualizarLista();
         }
     }
+
+
 }

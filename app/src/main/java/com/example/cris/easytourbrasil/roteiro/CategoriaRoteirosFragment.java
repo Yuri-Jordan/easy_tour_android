@@ -1,4 +1,4 @@
-package com.example.cris.easytourbrasil;
+package com.example.cris.easytourbrasil.roteiro;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -19,6 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.cris.easytourbrasil.R;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,38 +33,37 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class CategoriaParceirosFragment extends Fragment {
+
+public class CategoriaRoteirosFragment extends Fragment {
 
     private ProgressBar spinner;
 
     protected ListView listView;
-    public String[] catParceirosNome;
-    protected JSONArray categoriaParceiros;
-    public static final String TAG = CategoriaParceirosFragment.class.getSimpleName();
+    protected String[] catRoteirosNome;
+    protected JSONArray categoriaRoteiros;
+    public static final String TAG = CategoriaRoteirosFragment.class.getSimpleName();
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
-        View view = inflater.inflate( R.layout.fragment_categoria_parceiros, container, false);
-
+        View view = inflater.inflate( R.layout.fragment_categoria_roteiros, container, false);
         spinner = (ProgressBar)view.findViewById(R.id.ventilator_progress);
-
-        // Acessando a listView pelo Id=listViewCatParceiros
-        listView = (ListView) view.findViewById( R.id.listViewCatParceiros);
+        listView = (ListView) view.findViewById( R.id.listViewCatRoteiros);
 
         if(isInternetDisponivel()){
             spinner.setVisibility(View.VISIBLE);
-            new CategoriaParceirosTask().execute();
+            new CategoriaRoteirosTask().execute();
         }else{
             Toast.makeText(getActivity().getApplicationContext(), "Internet indisponível. Verifique sua conexão.", Toast.LENGTH_LONG).show();
         }
 
+
         return view;
 
-    }
 
+    }
 
     private boolean isInternetDisponivel() {
         ConnectivityManager gerenciador = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -76,22 +77,19 @@ public class CategoriaParceirosFragment extends Fragment {
     }
 
     private void atualizarLista() {
-        if(categoriaParceiros == null){
+        if(categoriaRoteiros == null){
             Toast.makeText(getActivity().getApplicationContext(), "Nao existem categorias cadastradas.", Toast.LENGTH_LONG).show();
         }else{
             try {
-                catParceirosNome =  new String[categoriaParceiros.length()];
+                catRoteirosNome =  new String[categoriaRoteiros.length()];
 
-                for(int i = 0; i < categoriaParceiros.length(); i++){
-                    JSONObject objeto = categoriaParceiros.getJSONObject(i);
+                for(int i = 0; i < categoriaRoteiros.length(); i++){
+                    JSONObject objeto = categoriaRoteiros.getJSONObject(i);
                     String atributo = objeto.getString("nome");
-                    catParceirosNome[i] = atributo;
+                    catRoteirosNome[i] = atributo;
                 }
 
-
-
-                // Vinculando os valores a listView
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, catParceirosNome){
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, catRoteirosNome){
                     @SuppressLint("ResourceAsColor")
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
@@ -101,10 +99,9 @@ public class CategoriaParceirosFragment extends Fragment {
                     }
                 };
                 spinner.setVisibility(View.INVISIBLE);
+
                 // Vinculando a lista com as informações
                 listView.setAdapter(arrayAdapter);
-
-
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 
@@ -112,16 +109,16 @@ public class CategoriaParceirosFragment extends Fragment {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Bundle bundle = new Bundle();
                         try {
-                            bundle.putString("parceiros", categoriaParceiros.getJSONObject(position).toString());
-                            ParceirosFragment pFragment = new ParceirosFragment();
-                            pFragment.setArguments(bundle);
+                            bundle.putInt("roteirosId", categoriaRoteiros.getJSONObject(position).getInt("id"));
+                            RoteirosFragment rFragment = new RoteirosFragment();
+                            rFragment.setArguments(bundle);
                             getActivity().getSupportFragmentManager().beginTransaction()
-                                    .replace( R.id.container, pFragment)
+                                    .replace( R.id.container, rFragment)
                                     .addToBackStack(null)
                                     .commit();
 
                         } catch (JSONException e) {
-                            Log.e(TAG, "Erro ao criar intent JsonArray catParceiros: ", e);
+                            Log.e(TAG, "Erro ao criar intent JsonArray categoriaRoteiros: ", e);
                         }
 
                     }
@@ -129,12 +126,12 @@ public class CategoriaParceirosFragment extends Fragment {
 
 
             } catch (JSONException e) {
-                Log.e(TAG, "Erro ao logar JsonArray catParceiros: ", e);
+                Log.e(TAG, "Erro ao logar JsonArray categoriaRoteiros: ", e);
             }
         }
     }
 
-    private class CategoriaParceirosTask extends AsyncTask<Object, Void, JSONArray> {
+    private class CategoriaRoteirosTask extends AsyncTask<Object, Void, JSONArray> {
 
 
         @Override
@@ -144,7 +141,7 @@ public class CategoriaParceirosFragment extends Fragment {
             JSONArray jsonArray = null;
 
             try{
-                URL apiCatParceirosURL = new URL("https://easy-tour-parceiros-api.herokuapp.com/api/categoriaParceiros");
+                URL apiCatParceirosURL = new URL("http://easy-tour-brasil-api.herokuapp.com/categorias");
                 HttpURLConnection connection = (HttpURLConnection) apiCatParceirosURL.openConnection();
                 connection.connect();
 
@@ -158,16 +155,16 @@ public class CategoriaParceirosFragment extends Fragment {
                 }
 
                 jsonArray = new JSONArray(conteudo.toString());
-//                Log.v(TAG, String.valueOf(jsonArray));
-//
-//                for(int i = 0; i < jsonArray.length(); i++){
-//                    JSONObject objeto = jsonArray.getJSONObject(i);
-//                    String atributo = objeto.getString("nome");
-//                    Log.v(TAG, atributo);
-//                }
-//
-//                responseStatus = connection.getResponseCode();
-//                Log.i(TAG, "Status: "+ responseStatus);
+                Log.v(TAG, String.valueOf(jsonArray));
+
+                for(int i = 0; i < jsonArray.length(); i++){
+                    JSONObject objeto = jsonArray.getJSONObject(i);
+                    String atributo = objeto.getString("nome");
+                    Log.v(TAG, atributo);
+                }
+
+                responseStatus = connection.getResponseCode();
+                Log.i(TAG, "Status: "+ responseStatus);
 
             }catch(MalformedURLException e){
                 Log.e(TAG, "Erro de URL: ", e);
@@ -180,9 +177,8 @@ public class CategoriaParceirosFragment extends Fragment {
         }
         @Override
         protected void onPostExecute(JSONArray resultDoInBackground){
-            categoriaParceiros = resultDoInBackground;
+            categoriaRoteiros = resultDoInBackground;
             atualizarLista();
         }
     }
-
 }

@@ -1,13 +1,14 @@
-package com.example.cris.easytourbrasil;
+package com.example.cris.easytourbrasil.parceiro;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -17,22 +18,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.cris.easytourbrasil.R;
+import com.example.cris.easytourbrasil.utilitarios.ConversorJson;
+import com.example.cris.easytourbrasil.utilitarios.PolylineUtil;
+import com.example.cris.easytourbrasil.utilitarios.RequisicaoHTTP;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.example.cris.easytourbrasil.R.id.container;
 
 
 public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback,
@@ -46,8 +53,9 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
     String provider;
 
     Marker currentMarker = null;
-
     Boolean botaoDeLocalizacaoClicado = false;
+    Boolean rotaTracada = false;
+    Polyline rotaAtual;
 
 
     @Override
@@ -128,7 +136,6 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -162,6 +169,11 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
             Log.d("Coordenada Lat", lat.toString());
             Log.d("Coordenada Lng", lng.toString());
 
+            if(rotaAtual != null)
+                rotaAtual.remove();
+
+            if(!rotaTracada)
+                new CriarRotaAteParceiroTask().execute(location);
         }
 
     }
@@ -189,4 +201,60 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
         // (the camera animates to the user's current position).
         return false;
     }
+
+
+    private class CriarRotaAteParceiroTask extends AsyncTask<Location, Void, String[]> {
+
+        @Override
+        protected  String[] doInBackground(Location... locations) {
+
+            String url= "";
+            String req = "";
+
+            Location loc = locations[0];
+
+            try {
+                url= "http://maps.googleapis.com/maps/api/directions/json?origin="
+                        + loc.getLatitude() +","+loc.getLongitude()+"&destination="
+                        + parceiro.getDouble("latitude")+","+parceiro.getDouble("longitude")+"&sensor=false";
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                req = new RequisicaoHTTP().lerUrl(url);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String[] listaDirecoes = new ConversorJson().converterDirecoes(req);
+
+            return listaDirecoes;
+        }
+        @Override
+        protected void onPostExecute(String[] resultDoInBackground){
+            if(!rotaTracada)
+                tracarRota(resultDoInBackground);
+        }
+    }
+
+    private void tracarRota(String[] listaDirecoes) {
+
+        rotaTracada = true;
+
+        PolylineUtil polylineUtil = new PolylineUtil();
+
+        int qtdDir = listaDirecoes.length;
+        for(int i = 0; i < qtdDir; i++)
+        {
+            PolylineOptions options = new PolylineOptions()
+                    .color(Color.BLACK)
+                    .width(10)
+                    .addAll(polylineUtil.decode(listaDirecoes[i]));
+
+            mMap.addPolyline(options);
+
+        }
+    }
+
 }

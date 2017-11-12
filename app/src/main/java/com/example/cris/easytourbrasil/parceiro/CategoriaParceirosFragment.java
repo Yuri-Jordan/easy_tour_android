@@ -1,4 +1,4 @@
-package com.example.cris.easytourbrasil;
+package com.example.cris.easytourbrasil.parceiro;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,8 +15,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.cris.easytourbrasil.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,35 +33,38 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class RoteirosFragment extends Fragment {
+public class CategoriaParceirosFragment extends Fragment {
 
+    private ProgressBar spinner;
 
     protected ListView listView;
-    protected JSONArray roteiros;
-    protected String[] roteirosNome;
-    protected  int roteiroId;
-    public static final String TAG = RoteirosFragment.class.getSimpleName();
+    public String[] catParceirosNome;
+    protected JSONArray categoriaParceiros;
+    public static final String TAG = CategoriaParceirosFragment.class.getSimpleName();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
 
-        View view = inflater.inflate( R.layout.fragment_roteiros, container, false);
+        View view = inflater.inflate( R.layout.fragment_categoria_parceiros, container, false);
 
-        listView = (ListView) view.findViewById( R.id.listViewRoteiros);
+        spinner = (ProgressBar)view.findViewById(R.id.ventilator_progress);
 
-        roteiroId = this.getArguments().getInt("roteirosId");
+        // Acessando a listView pelo Id=listViewCatParceiros
+        listView = (ListView) view.findViewById( R.id.listViewCatParceiros);
 
         if(isInternetDisponivel()){
-            new RoteirosTask().execute();
+            spinner.setVisibility(View.VISIBLE);
+            new CategoriaParceirosTask().execute();
         }else{
             Toast.makeText(getActivity().getApplicationContext(), "Internet indisponível. Verifique sua conexão.", Toast.LENGTH_LONG).show();
         }
 
-        // Inflate the layout for this fragment
         return view;
+
     }
+
 
     private boolean isInternetDisponivel() {
         ConnectivityManager gerenciador = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -72,19 +78,22 @@ public class RoteirosFragment extends Fragment {
     }
 
     private void atualizarLista() {
-        if(roteiros == null || roteiros.length() == 0){
-            Toast.makeText(getActivity().getApplicationContext(), "Nao existem roteiros para esta categoria.", Toast.LENGTH_LONG).show();
+        if(categoriaParceiros == null){
+            Toast.makeText(getActivity().getApplicationContext(), "Nao existem categorias cadastradas.", Toast.LENGTH_LONG).show();
         }else{
             try {
-                roteirosNome =  new String[roteiros.length()];
+                catParceirosNome =  new String[categoriaParceiros.length()];
 
-                for(int i = 0; i < roteiros.length(); i++){
-                    JSONObject objeto = roteiros.getJSONObject(i);
+                for(int i = 0; i < categoriaParceiros.length(); i++){
+                    JSONObject objeto = categoriaParceiros.getJSONObject(i);
                     String atributo = objeto.getString("nome");
-                    roteirosNome[i] = atributo;
+                    catParceirosNome[i] = atributo;
                 }
 
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, roteirosNome){
+
+
+                // Vinculando os valores a listView
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, catParceirosNome){
                     @SuppressLint("ResourceAsColor")
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
@@ -93,8 +102,11 @@ public class RoteirosFragment extends Fragment {
                         return textView;
                     }
                 };
-
+                spinner.setVisibility(View.INVISIBLE);
+                // Vinculando a lista com as informações
                 listView.setAdapter(arrayAdapter);
+
+
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 
@@ -102,16 +114,16 @@ public class RoteirosFragment extends Fragment {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Bundle bundle = new Bundle();
                         try {
-                            bundle.putInt("roteiroId", roteiros.getJSONObject(position).getInt("id"));
-                            RoteirosMapFragment rmFragment = new RoteirosMapFragment();
-                            rmFragment.setArguments(bundle);
+                            bundle.putString("parceiros", categoriaParceiros.getJSONObject(position).toString());
+                            ParceirosFragment pFragment = new ParceirosFragment();
+                            pFragment.setArguments(bundle);
                             getActivity().getSupportFragmentManager().beginTransaction()
-                                    .replace( R.id.container, rmFragment)
+                                    .replace( R.id.container, pFragment)
                                     .addToBackStack(null)
                                     .commit();
 
                         } catch (JSONException e) {
-                            Log.e(TAG, "Erro ao criar intent JsonArray categoriaRoteiros: ", e);
+                            Log.e(TAG, "Erro ao criar intent JsonArray catParceiros: ", e);
                         }
 
                     }
@@ -119,13 +131,12 @@ public class RoteirosFragment extends Fragment {
 
 
             } catch (JSONException e) {
-                Log.e(TAG, "Erro ao logar JsonArray categoriaRoteiros: ", e);
+                Log.e(TAG, "Erro ao logar JsonArray catParceiros: ", e);
             }
         }
     }
 
-
-    private class RoteirosTask extends AsyncTask<Object, Void, JSONArray> {
+    private class CategoriaParceirosTask extends AsyncTask<Object, Void, JSONArray> {
 
 
         @Override
@@ -135,7 +146,7 @@ public class RoteirosFragment extends Fragment {
             JSONArray jsonArray = null;
 
             try{
-                URL apiCatParceirosURL = new URL("http://easy-tour-brasil-api.herokuapp.com/categorias/" + roteiroId + "/roteiros");
+                URL apiCatParceirosURL = new URL("https://easy-tour-parceiros-api.herokuapp.com/api/categoriaParceiros");
                 HttpURLConnection connection = (HttpURLConnection) apiCatParceirosURL.openConnection();
                 connection.connect();
 
@@ -149,16 +160,16 @@ public class RoteirosFragment extends Fragment {
                 }
 
                 jsonArray = new JSONArray(conteudo.toString());
-                Log.v(TAG, String.valueOf(jsonArray));
-
-                for(int i = 0; i < jsonArray.length(); i++){
-                    JSONObject objeto = jsonArray.getJSONObject(i);
-                    String atributo = objeto.getString("nome");
-                    Log.v(TAG, atributo);
-                }
-
-                responseStatus = connection.getResponseCode();
-                Log.i(TAG, "Status: "+ responseStatus);
+//                Log.v(TAG, String.valueOf(jsonArray));
+//
+//                for(int i = 0; i < jsonArray.length(); i++){
+//                    JSONObject objeto = jsonArray.getJSONObject(i);
+//                    String atributo = objeto.getString("nome");
+//                    Log.v(TAG, atributo);
+//                }
+//
+//                responseStatus = connection.getResponseCode();
+//                Log.i(TAG, "Status: "+ responseStatus);
 
             }catch(MalformedURLException e){
                 Log.e(TAG, "Erro de URL: ", e);
@@ -171,10 +182,9 @@ public class RoteirosFragment extends Fragment {
         }
         @Override
         protected void onPostExecute(JSONArray resultDoInBackground){
-            roteiros = resultDoInBackground;
+            categoriaParceiros = resultDoInBackground;
             atualizarLista();
         }
     }
-
 
 }

@@ -1,4 +1,4 @@
-package com.example.cris.easytourbrasil;
+package com.example.cris.easytourbrasil.parceiro;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
@@ -13,6 +13,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.cris.easytourbrasil.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

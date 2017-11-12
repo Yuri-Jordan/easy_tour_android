@@ -1,4 +1,4 @@
-package com.example.cris.easytourbrasil;
+package com.example.cris.easytourbrasil.roteiro;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.cris.easytourbrasil.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;

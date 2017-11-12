@@ -14,6 +14,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.cris.easytourbrasil.parceiro.CategoriaParceirosFragment;
+import com.example.cris.easytourbrasil.roteiro.CategoriaRoteirosFragment;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
