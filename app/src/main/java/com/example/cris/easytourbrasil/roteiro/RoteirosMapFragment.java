@@ -1,10 +1,15 @@
 package com.example.cris.easytourbrasil.roteiro;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,11 +18,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.cris.easytourbrasil.R;
+import com.example.cris.easytourbrasil.parceiro.ParceirosMapFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -33,13 +40,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 
-public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback {
+public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
+        LocationListener, GoogleMap.OnMyLocationButtonClickListener {
 
     protected JSONArray roteiro;
-    protected  int roteiroId;
+    protected int roteiroId;
     public static final String TAG = RoteirosMapFragment.class.getSimpleName();
     private GoogleMap mMap;
     SupportMapFragment mapFragment;
+
+    boolean botaoDeLocalizacaoClicado = false;
+    Marker currentMarker = null;
+    boolean rotaTracada = false;
 
 
     @Override
@@ -49,14 +61,14 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback 
         roteiroId = this.getArguments().getInt("roteiroId");
 
 
-        View view = inflater.inflate( R.layout.fragment_roteiros_map, container, false);
+        View view = inflater.inflate(R.layout.fragment_roteiros_map, container, false);
 
-        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById( R.id.roteirosMap);
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.roteirosMap);
 
 
-        if(isInternetDisponivel()){
+        if (isInternetDisponivel()) {
             new PontosTask().execute();
-        }else{
+        } else {
             Toast.makeText(getActivity().getApplicationContext(), "Internet indisponível. Verifique sua conexão.", Toast.LENGTH_LONG).show();
         }
 
@@ -68,7 +80,7 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback 
         ConnectivityManager gerenciador = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = gerenciador.getActiveNetworkInfo();
 
-        if(netInfo != null && netInfo.isConnected())
+        if (netInfo != null && netInfo.isConnected())
             return true;
 
         return false;
@@ -77,7 +89,20 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback 
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
+
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+        }
+        mMap.setMyLocationEnabled(true);
+        mMap.setOnMyLocationButtonClickListener(this);
 
         for(int i = 0; i < roteiro.length(); i++){
             try {
@@ -94,6 +119,59 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback 
     }
     private void iniciarMapa(){
         mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+        if(botaoDeLocalizacaoClicado){
+
+            Double lat = location.getLatitude();
+            Double lng = location.getLongitude();
+
+            LatLng localizacao = new LatLng(lat, lng);
+
+            if (currentMarker!=null) {
+                currentMarker.remove();
+                currentMarker=null;
+            }
+
+            if (currentMarker==null) {
+                currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localizacao"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 15));
+            }
+
+            Log.d("Coordenada Lat", lat.toString());
+            Log.d("Coordenada Lng", lng.toString());
+
+//
+//            if(!rotaTracada)
+//                new ParceirosMapFragment.CriarRotaAteRoteiroTask().execute(location);
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        botaoDeLocalizacaoClicado = true;
+        Toast.makeText(getActivity(), "MyLocation button clicked", Toast.LENGTH_SHORT).show();
+        // Return false so that we don't consume the event and the default behavior still occurs
+        // (the camera animates to the user's current position).
+        return false;
     }
 
 
@@ -149,5 +227,8 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback 
 
         }
     }
+
+
+    //private class CriarRotaAteParceiroTask extends AsyncTask<Location, Void, String[]> {}
 
 }

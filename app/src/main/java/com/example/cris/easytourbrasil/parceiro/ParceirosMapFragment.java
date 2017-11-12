@@ -29,17 +29,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback,
@@ -53,8 +48,8 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
     String provider;
 
     Marker currentMarker = null;
-    Boolean botaoDeLocalizacaoClicado = false;
-    Boolean rotaTracada = false;
+    boolean botaoDeLocalizacaoClicado = false;
+    boolean rotaTracada = false;
     Polyline rotaAtual;
 
 
