@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,8 +72,8 @@ public class RoteirosFragment extends Fragment {
     }
 
     private void atualizarLista() {
-        if(roteiros == null){
-            Toast.makeText(getActivity().getApplicationContext(), "Nao existem categorias cadastradas.", Toast.LENGTH_LONG).show();
+        if(roteiros == null || roteiros.length() == 0){
+            Toast.makeText(getActivity().getApplicationContext(), "Nao existem roteiros para esta categoria.", Toast.LENGTH_LONG).show();
         }else{
             try {
                 roteirosNome =  new String[roteiros.length()];
