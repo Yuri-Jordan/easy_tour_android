@@ -149,6 +149,14 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
             if (currentMarker==null) {
                 currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localizacao"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 15));
+
+                float[] results = new float[10];
+                try {
+                    location.distanceBetween(lat, lng, parceiro.getDouble("latitude"), parceiro.getDouble("longitude"), results);
+                    currentMarker.setSnippet("Você está a " + String.format("%.0f", results[0]) + "m de " + parceiro.getString("nome_fantasia"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             Log.d("Coordenada Lat", lat.toString());
