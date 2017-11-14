@@ -131,8 +131,8 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
             // for ActivityCompat#requestPermissions for more details.
 
         }
-        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 5, this);
+        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 5, this);
         location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
