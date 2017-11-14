@@ -10,6 +10,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -29,7 +30,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONException;
@@ -50,7 +50,7 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
     Marker currentMarker = null;
     boolean botaoDeLocalizacaoClicado = false;
     boolean rotaTracada = false;
-    Polyline rotaAtual;
+
 
 
     @Override
@@ -70,7 +70,6 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         locManager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        provider = locManager.getBestProvider(new Criteria(), false);
 
         if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -83,8 +82,10 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
 
         }
-        location = locManager.getLastKnownLocation(provider);
-
+        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         return view;
 
     }
@@ -103,7 +104,17 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
         }
-        locManager.requestLocationUpdates(provider, 3000, 5, this);
+        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        locManager.removeUpdates(this);
+
     }
 
     @Override
@@ -122,7 +133,7 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
 
-        LatLng localParceiro = null;
+        LatLng localParceiro;
         try {
             localParceiro = new LatLng(parceiro.getDouble("latitude"), parceiro.getDouble("longitude"));
             mMap.addMarker(new MarkerOptions().position(localParceiro).title(parceiro.getString("nome_fantasia")));
@@ -164,11 +175,6 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
             Log.d("Coordenada Lat", lat.toString());
             Log.d("Coordenada Lng", lng.toString());
 
-            if(rotaAtual != null)
-                rotaAtual.remove();
-
-            if(!rotaTracada)
-                new CriarRotaAteParceiroTask().execute(location);
         }
 
     }
@@ -191,9 +197,14 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
     @Override
     public boolean onMyLocationButtonClick() {
         botaoDeLocalizacaoClicado = true;
-        Toast.makeText(getActivity(), "MyLocation button clicked", Toast.LENGTH_SHORT).show();
+
+        //SystemClock.sleep(15000);
+
+        if(!rotaTracada)
+            new CriarRotaAteParceiroTask().execute(location);
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).
+
         return false;
     }
 
