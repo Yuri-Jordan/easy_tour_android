@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.cris.easytourbrasil.R;
-import com.example.cris.easytourbrasil.parceiro.ParceirosMapFragment;
 import com.example.cris.easytourbrasil.utilitarios.ConversorJson;
 import com.example.cris.easytourbrasil.utilitarios.PolylineUtil;
 import com.example.cris.easytourbrasil.utilitarios.RequisicaoHTTP;
@@ -33,6 +32,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
@@ -46,7 +46,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -66,6 +68,7 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
     boolean botaoDeLocalizacaoClicado = false;
     Marker currentMarker = null;
     boolean rotaTracada = false;
+    List<Polyline> rota = new ArrayList<>();
 
 
     @Override
@@ -197,7 +200,7 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
 
             if (currentMarker==null) {
                 currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localizacao"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 15));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 17));
             }
 
             Log.d("Coordenada Lat", lat.toString());
@@ -208,6 +211,9 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
 
                 marcadores.get(proxPonto).remove();
                 proxPonto++;
+
+                new CriarRotaAteRoteiroTask().execute(location);
+
                 atualizaDistancia(lat, lng);
             }
 
@@ -342,28 +348,39 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
         }
         @Override
         protected void onPostExecute(String[] resultDoInBackground){
-            if(!rotaTracada)
-                tracarRota(resultDoInBackground);
+
+            tracarRota(resultDoInBackground);
         }
     }
 
     private void tracarRota(String[] listaDirecoes) {
 
-        rotaTracada = true;
+        if(rota != null){
+            deletarRota();
+        }
 
         PolylineUtil polylineUtil = new PolylineUtil();
+        PolylineOptions options = null;
 
         int qtdDir = listaDirecoes.length;
         for(int i = 0; i < qtdDir; i++)
         {
-            PolylineOptions options = new PolylineOptions()
+            options = new PolylineOptions()
                     .color(Color.BLACK)
                     .width(10)
                     .addAll(polylineUtil.decode(listaDirecoes[i]));
 
-            mMap.addPolyline(options);
-
+            rota.add(mMap.addPolyline(options));
         }
+
+    }
+
+    private void deletarRota(){
+        for(Polyline line : rota)
+        {
+            line.remove();
+        }
+        rota.clear();
     }
 
 }

@@ -30,6 +30,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONException;
@@ -45,12 +46,9 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
     private GoogleMap mMap;
     LocationManager locManager;
     Location location;
-
     Marker currentMarker = null;
     boolean botaoDeLocalizacaoClicado = false;
     boolean rotaTracada = false;
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
