@@ -4,13 +4,13 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -45,7 +45,6 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
     private GoogleMap mMap;
     LocationManager locManager;
     Location location;
-    String provider;
 
     Marker currentMarker = null;
     boolean botaoDeLocalizacaoClicado = false;
@@ -71,6 +70,11 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
 
         locManager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 
+        if (isInternetDisponivel()) {
+        } else {
+            Toast.makeText(getActivity().getApplicationContext(), "Internet indisponível. Verifique sua conexão.", Toast.LENGTH_LONG).show();
+        }
+
         if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -87,6 +91,17 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
         location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         return view;
+
+    }
+
+    private boolean isInternetDisponivel() {
+        ConnectivityManager gerenciador = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = gerenciador.getActiveNetworkInfo();
+
+        if (netInfo != null && netInfo.isConnected())
+            return true;
+
+        return false;
 
     }
 
@@ -163,12 +178,8 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
                 currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localizacao"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 15));
 
-                float[] results = new float[10];
-                try {
-                    location.distanceBetween(lat, lng, parceiro.getDouble("latitude"), parceiro.getDouble("longitude"), results);
-                    currentMarker.setSnippet("Você está a " + String.format("%.0f", results[0]) + "m de " + parceiro.getString("nome_fantasia"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if(atualizaDistancia(lat, lng) < 3000){
+                    Log.v(TAG, "ta perto");
                 }
             }
 
@@ -177,6 +188,18 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
 
         }
 
+    }
+
+    private int atualizaDistancia(double lat, double lng){
+
+        float[] results = new float[10];
+        try {
+            location.distanceBetween(lat, lng, parceiro.getDouble("latitude"), parceiro.getDouble("longitude"), results);
+            currentMarker.setSnippet("Você está a " + String.format("%.0f", results[0]) + "m de " + parceiro.getString("nome_fantasia"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Integer.parseInt(String.format("%.0f", results[0]));
     }
 
     @Override

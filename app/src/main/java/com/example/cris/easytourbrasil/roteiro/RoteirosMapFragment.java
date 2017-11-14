@@ -46,6 +46,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
@@ -58,7 +60,8 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
     SupportMapFragment mapFragment;
     LocationManager locManager;
     Location location;
-    String provider;
+    int proxPonto = 0;
+    Map<Integer, Marker> marcadores = new HashMap<>();
 
     boolean botaoDeLocalizacaoClicado = false;
     Marker currentMarker = null;
@@ -77,8 +80,6 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.roteirosMap);
 
         locManager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        provider = locManager.getBestProvider(new Criteria(), false);
-
 
         if (isInternetDisponivel()) {
             new PontosTask().execute();
@@ -113,7 +114,6 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
             return true;
 
         return false;
-
     }
 
     @Override
@@ -165,13 +165,15 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
             try {
                 JSONObject ponto = roteiro.getJSONObject(i).getJSONObject("ponto");
                 LatLng localParceiro = new LatLng(ponto.getDouble("latitude"), ponto.getDouble("longitude"));
-                mMap.addMarker(new MarkerOptions().position(localParceiro).title(ponto.getString("nome")));
+                marcadores.put(new Integer(proxPonto), mMap.addMarker(new MarkerOptions().position(localParceiro).title(ponto.getString("nome"))));
+                proxPonto++;
                 mMap.moveCamera( CameraUpdateFactory.newLatLngZoom(localParceiro, 17));
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        proxPonto = 0;
 
     }
     private void iniciarMapa(){
@@ -201,7 +203,29 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
             Log.d("Coordenada Lat", lat.toString());
             Log.d("Coordenada Lng", lng.toString());
 
+            if(atualizaDistancia(lat, lng) < 100){
+                Log.v(TAG, "Visitou " + marcadores.get(proxPonto).getTitle());
+
+                marcadores.get(proxPonto).remove();
+                proxPonto++;
+                atualizaDistancia(lat, lng);
+            }
+
         }
+    }
+
+    private int atualizaDistancia(double lat, double lng){
+
+        float[] results = new float[10];
+        try {
+            JSONObject ponto = roteiro.getJSONObject(proxPonto).getJSONObject("ponto");
+
+            location.distanceBetween(lat, lng, ponto.getDouble("latitude"), ponto.getDouble("longitude"), results);
+            currentMarker.setSnippet("Você está a " + String.format("%.0f", results[0]) + "m de " + ponto.getString("nome"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Integer.parseInt(String.format("%.0f", results[0]));
     }
 
     @Override
@@ -293,31 +317,18 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
             JSONObject ponto = null;
 
             try {
-                ponto = roteiro.getJSONObject(0).getJSONObject("ponto");
+                ponto = roteiro.getJSONObject(proxPonto).getJSONObject("ponto");
 
                 Location loc = locations[0];
 
                 url= "https://maps.googleapis.com/maps/api/directions/json?origin="
                         + loc.getLatitude() +","+loc.getLongitude()+"&destination="
-                        + ponto.getDouble("latitude")+","+ponto.getDouble("longitude")+"&sensor=false&waypoints=optimize:true";
-
-                for(int i = 1; i < roteiro.length(); i++){
-
-                    try {
-                        JSONObject p = roteiro.getJSONObject(i).getJSONObject("ponto");
-                        url += "|" + p.getDouble("latitude") + "," + p.getDouble("longitude");
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
+                        + ponto.getDouble("latitude")+","+ponto.getDouble("longitude")+"&sensor=false";
 
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            Log.v("url waypoints: ", url);
 
             try {
                 req = new RequisicaoHTTP().lerUrl(url);
