@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.cris.easytourbrasil.app.LoginActivity"
+    android:orientation="vertical"
+    style="@style/BackGroundAutententicacao">
+
+    <TextView style="@style/TituloAutententicacao"/>
+
+    <TableLayout style="@style/CaixaDeAutenticacao">
+
+        <EditText
+            android:id="@+id/login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Usuário"
+            android:inputType="text" />
+
+        <requestFocus />
+
+        <EditText
+            android:id="@+id/senha"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Senha"
+            android:inputType="textPassword" />
+
+    </TableLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/divisaoBotoesAutenticacao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
+
+        <Button
+            style="@style/BotaoDeAcessoAutententicacao"
+            android:text="ACESSAR"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@id/divisaoBotoesAutenticacao"
+            android:layout_marginRight="0dp"/>
+
+        <Button
+            style="@style/BotaoDeAcessoAutententicacao"
+            android:text="CANCELAR"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@id/divisaoBotoesAutenticacao"
+            android:layout_marginLeft="0dp"/>
+
+    </RelativeLayout>
+
+
+    <TextView style="@style/TextoCriarContaAutententicacao"
+        android:layout_marginTop="16dp"
+        android:id="@+id/textoCadastro"
+        android:text="Não tem conta? Cadastre-se!"
+        android:textColor="@android:color/white"/>
+
+</LinearLayout>

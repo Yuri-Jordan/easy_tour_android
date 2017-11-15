@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.cris.easytourbrasil.app.CadastroActivity"
+    style="@style/BackGroundAutententicacao">
+
+    <TextView style="@style/TituloAutententicacao" />
+
+    <TableLayout style="@style/CaixaDeAutenticacao">
+        <EditText
+            android:id="@+id/loginCadastro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Usuário"
+            android:inputType="text" />
+            <requestFocus/>
+        <EditText
+            android:id="@+id/senhaCadastro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:hint="Senha"/>
+        <EditText
+            android:id="@+id/emailCadastro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:hint="Email"/>
+    </TableLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/divisaoBotoesAutenticacao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
+        <Button
+            style="@style/BotaoDeAcessoAutententicacao"
+            android:text="ACESSAR"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@id/divisaoBotoesAutenticacao"
+            android:layout_marginRight="0dp"/>
+
+        <Button
+            android:id="@+id/cancelarCadastro"
+            style="@style/BotaoDeAcessoAutententicacao"
+            android:text="CANCELAR"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@id/divisaoBotoesAutenticacao"
+            android:layout_marginLeft="0dp"/>
+
+
+    </RelativeLayout>
+
+</LinearLayout>
