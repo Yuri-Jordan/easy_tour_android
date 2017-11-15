@@ -8,7 +8,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.cris.easytourbrasil.MainActivity;
-import com.example.cris.easytourbrasil.MapsActivity;
 import com.example.cris.easytourbrasil.R;
 
 public class LoginActivity extends AppCompatActivity {
