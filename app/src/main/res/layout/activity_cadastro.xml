@@ -17,18 +17,29 @@
             android:hint="Usuário"
             android:inputType="text" />
             <requestFocus/>
-        <EditText
-            android:id="@+id/senhaCadastro"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:hint="Senha"/>
+
         <EditText
             android:id="@+id/emailCadastro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
             android:hint="Email"/>
+
+        <EditText
+            android:id="@+id/senhaCadastro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:hint="Senha"/>
+
+        <EditText
+            android:id="@+id/senhaCadastroNovamente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:hint="Senha novamente"/>
+
+
     </TableLayout>
 
     <RelativeLayout
@@ -42,8 +53,9 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"/>
         <Button
+            android:id="@+id/botaoCadastrar"
             style="@style/BotaoDeAcessoAutententicacao"
-            android:text="ACESSAR"
+            android:text="CADASTRAR"
             android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@id/divisaoBotoesAutenticacao"
             android:layout_marginRight="0dp"/>
