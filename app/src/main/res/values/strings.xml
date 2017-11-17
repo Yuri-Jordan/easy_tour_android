@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">Easy Tour Brasil</string>
+    <string name="app_name">Easy Tour Brasil - Yuri|Hugo</string>
     <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to login -->
@@ -15,7 +15,7 @@
         completions."
     </string>
     <string name="title_activity_maps">Map</string>
-    <string name="title_activity_main">Easy Tour Brasil</string>
+    <string name="title_activity_main">Easy Tour Brasil - Yuri|Hugo</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

@@ -1,5 +1,6 @@
 package com.example.cris.easytourbrasil;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 
 import com.example.cris.easytourbrasil.parceiro.CategoriaParceirosFragment;
 import com.example.cris.easytourbrasil.roteiro.CategoriaRoteirosFragment;
+import com.example.cris.easytourbrasil.app.LoginActivity;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -108,7 +110,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_configuracoes) {
             fragmentManager.beginTransaction().replace(R.id.container, new ConfiguracoesFragment()).commit();
         } else if (id == R.id.nav_sair) {
-            fragmentManager.beginTransaction().replace(R.id.container, new SairFragment()).commit();
+            //fragmentManager.beginTransaction().replace(R.id.container, new SairFragment()).commit();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

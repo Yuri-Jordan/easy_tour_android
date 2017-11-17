@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -47,6 +48,7 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
     LocationManager locManager;
     Location location;
     Marker currentMarker = null;
+    String provider;
     boolean botaoDeLocalizacaoClicado = false;
     boolean rotaTracada = false;
 
@@ -66,7 +68,8 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.parceirosMap);
         mapFragment.getMapAsync(this);
 
-        locManager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        locManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        provider = locManager.getBestProvider(new Criteria(), false);
 
         if (isInternetDisponivel()) {
         } else {
@@ -84,10 +87,11 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
 
         }
-        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if(locManager.getLastKnownLocation(provider) != null)
+            location = locManager.getLastKnownLocation(provider);
+        else
+            locManager.requestLocationUpdates(provider, 0, 0, this);
+
         return view;
 
     }
@@ -117,10 +121,11 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
         }
-        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 5, this);
-        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 5, this);
-        location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        provider = locManager.getBestProvider(new Criteria(), false);
+        if(locManager.getLastKnownLocation(provider) != null)
+            location = locManager.getLastKnownLocation(provider);
+        else
+            locManager.requestLocationUpdates(provider, 0, 5, this);
     }
 
     @Override
