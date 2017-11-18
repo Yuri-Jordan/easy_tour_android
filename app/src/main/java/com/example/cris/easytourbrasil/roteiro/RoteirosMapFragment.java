@@ -62,10 +62,9 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
     Location location;
     int proxPonto = 0;
     Map<Integer, Marker> marcadores = new HashMap<>();
-
+    private static final int INTERVALO_ATUALIZACAO_LOCALIZACAO = 5;
     boolean botaoDeLocalizacaoClicado = false;
     Marker currentMarker = null;
-    boolean rotaTracada = false;
     List<Polyline> rota = new ArrayList<>();
 
 
@@ -80,31 +79,63 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
 
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.roteirosMap);
 
-        locManager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-
         if (isInternetDisponivel()) {
             new PontosTask().execute();
         } else {
             Toast.makeText(getActivity().getApplicationContext(), "Internet indisponível. Verifique sua conexão.", Toast.LENGTH_LONG).show();
         }
 
-        if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-
-        }
-        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        pegarLocalizacao();
 
         return view;
+    }
+
+    private void pegarLocalizacao() {
+
+        locManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        boolean gpsDisponivel = locManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        boolean netDisponivel = locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if (!gpsDisponivel && !netDisponivel) {
+            return;
+        } else {
+            if (gpsDisponivel) {
+                if (location == null) {
+                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                    }
+                    locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, INTERVALO_ATUALIZACAO_LOCALIZACAO, this);
+                    Log.d(TAG, "GPS Habilitado");
+                    if (locManager != null) {
+                        location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    }
+                }
+            } else if (netDisponivel) {
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                }
+                locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, INTERVALO_ATUALIZACAO_LOCALIZACAO, this);
+                Log.d(TAG, "Network provider habilitado");
+                if (locManager != null) {
+                    location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                }
+            }
+        }
+
     }
 
     private boolean isInternetDisponivel() {
@@ -115,27 +146,6 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
             return true;
 
         return false;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-
-        }
-        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 5, this);
-        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 5, this);
-        location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
 
     @Override
@@ -162,13 +172,13 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
 
-        for(int i = 0; i < roteiro.length(); i++){
+        for (int i = 0; i < roteiro.length(); i++) {
             try {
                 JSONObject ponto = roteiro.getJSONObject(i).getJSONObject("ponto");
                 LatLng localParceiro = new LatLng(ponto.getDouble("latitude"), ponto.getDouble("longitude"));
                 marcadores.put(new Integer(proxPonto), mMap.addMarker(new MarkerOptions().position(localParceiro).title(ponto.getString("nome"))));
                 proxPonto++;
-                mMap.moveCamera( CameraUpdateFactory.newLatLngZoom(localParceiro, 17));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localParceiro, 17));
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -177,48 +187,49 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
         proxPonto = 0;
 
     }
-    private void iniciarMapa(){
+
+    private void iniciarMapa() {
         mapFragment.getMapAsync(this);
+
     }
 
     @Override
     public void onLocationChanged(Location location) {
 
-        if(botaoDeLocalizacaoClicado){
+        if (botaoDeLocalizacaoClicado) {
 
             Double lat = location.getLatitude();
             Double lng = location.getLongitude();
 
             LatLng localizacao = new LatLng(lat, lng);
 
-            if (currentMarker!=null) {
+            if (currentMarker != null) {
                 currentMarker.remove();
-                currentMarker=null;
+                currentMarker = null;
             }
 
-            if (currentMarker==null) {
+            if (currentMarker == null) {
                 currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localizacao"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 17));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 18));
             }
 
             Log.d("Coordenada Lat", lat.toString());
             Log.d("Coordenada Lng", lng.toString());
 
-            if(atualizaDistancia(lat, lng) < 100){
+            if (atualizaDistancia(lat, lng) < 100) {
                 Log.v(TAG, "Visitou " + marcadores.get(proxPonto).getTitle());
 
                 marcadores.get(proxPonto).remove();
                 proxPonto++;
 
                 new CriarRotaAteRoteiroTask().execute(location);
-
                 atualizaDistancia(lat, lng);
             }
 
         }
     }
 
-    private int atualizaDistancia(double lat, double lng){
+    private int atualizaDistancia(double lat, double lng) {
 
         float[] results = new float[10];
         try {
@@ -244,14 +255,32 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onProviderDisabled(String provider) {
-
+        Log.v(TAG, "Provider desabilitado");
+        pegarLocalizacao();
     }
 
     @Override
     public boolean onMyLocationButtonClick() {
+        Log.v(TAG, "CLICADO");
+
+        if (location == null){
+            pegarLocalizacao();
+            if(location == null)
+                return false;
+        }
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+        }
+        location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         botaoDeLocalizacaoClicado = true;
-        if(!rotaTracada)
-            new CriarRotaAteRoteiroTask().execute(location);
+        new CriarRotaAteRoteiroTask().execute(location);
+
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).
         return false;
@@ -305,7 +334,6 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
         @Override
         protected void onPostExecute(JSONArray resultDoInBackground){
             roteiro = resultDoInBackground;
-
             iniciarMapa();
 
         }
@@ -327,7 +355,7 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
 
                 url= "https://maps.googleapis.com/maps/api/directions/json?origin="
                         + loc.getLatitude() +","+loc.getLongitude()+"&destination="
-                        + ponto.getDouble("latitude")+","+ponto.getDouble("longitude")+"&sensor=false";
+                        + ponto.getDouble("latitude")+","+ponto.getDouble("longitude")+"&sensor=false&mode=walking";
 
 
             } catch (JSONException e) {
@@ -365,7 +393,7 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
         {
             options = new PolylineOptions()
                     .color(Color.BLACK)
-                    .width(10)
+                    .width(5)
                     .addAll(polylineUtil.decode(listaDirecoes[i]));
 
             rota.add(mMap.addPolyline(options));

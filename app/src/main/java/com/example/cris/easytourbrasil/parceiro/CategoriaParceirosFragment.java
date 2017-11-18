@@ -65,6 +65,10 @@ public class CategoriaParceirosFragment extends Fragment {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 
     private boolean isInternetDisponivel() {
         ConnectivityManager gerenciador = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);

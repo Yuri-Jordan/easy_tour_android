@@ -281,7 +281,7 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
         {
             PolylineOptions options = new PolylineOptions()
                     .color(Color.BLACK)
-                    .width(10)
+                    .width(5)
                     .addAll(polylineUtil.decode(listaDirecoes[i]));
 
             mMap.addPolyline(options);

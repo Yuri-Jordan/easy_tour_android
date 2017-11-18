@@ -42,8 +42,7 @@ public class RequisicaoHTTP {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             if(inputStream != null)
                 inputStream.close();
             urlConnection.disconnect();
