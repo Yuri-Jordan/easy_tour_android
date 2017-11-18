@@ -150,7 +150,7 @@ public class CategoriaParceirosFragment extends Fragment {
             JSONArray jsonArray = null;
 
             try{
-                URL apiCatParceirosURL = new URL("https://easy-tour-parceiros-api.herokuapp.com/api/categoriaParceiros");
+                URL apiCatParceirosURL = new URL("http://easytourbrasil.com.br/adminApi/api/categoriaParceiros");
                 HttpURLConnection connection = (HttpURLConnection) apiCatParceirosURL.openConnection();
                 connection.connect();
 

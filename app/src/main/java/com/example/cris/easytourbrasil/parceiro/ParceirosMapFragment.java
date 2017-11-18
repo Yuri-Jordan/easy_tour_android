@@ -21,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.cris.easytourbrasil.R;
-import com.example.cris.easytourbrasil.roteiro.RoteirosMapFragment;
 import com.example.cris.easytourbrasil.utilitarios.ConversorJson;
 import com.example.cris.easytourbrasil.utilitarios.PolylineUtil;
 import com.example.cris.easytourbrasil.utilitarios.RequisicaoHTTP;
@@ -47,6 +46,8 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
 
     public static final String TAG = ParceirosMapFragment.class.getSimpleName();
     private static final int INTERVALO_ATUALIZACAO_LOCALIZACAO = 5;
+    private static final int DISTANCIA_DE_PONTO_METROS = 5;
+    private static final String CHAVE_GOOGLE_MAPS = "AIzaSyDcAGiJxsR6ZQWgAgAYZZQLRy_aLhMLiVM";
 
     protected JSONObject parceiro;
     private GoogleMap mMap;
@@ -285,9 +286,9 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
             Location loc = locations[0];
 
             try {
-                url= "http://maps.googleapis.com/maps/api/directions/json?origin="
+                url= "https://maps.googleapis.com/maps/api/directions/json?origin="
                         + loc.getLatitude() +","+loc.getLongitude()+"&destination="
-                        + parceiro.getDouble("latitude")+","+parceiro.getDouble("longitude")+"&sensor=false$mode=walking";
+                        + parceiro.getDouble("latitude")+","+parceiro.getDouble("longitude")+"&sensor=false&mode=walking&key="+CHAVE_GOOGLE_MAPS;
             } catch (JSONException e) {
                 e.printStackTrace();
             }
