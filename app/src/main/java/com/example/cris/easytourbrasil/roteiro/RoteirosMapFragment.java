@@ -53,16 +53,17 @@ import java.util.Map;
 public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
         LocationListener, GoogleMap.OnMyLocationButtonClickListener {
 
+    public static final String TAG = RoteirosMapFragment.class.getSimpleName();
+    private static final int INTERVALO_ATUALIZACAO_LOCALIZACAO = 5;
+
     protected JSONArray roteiro;
     protected int roteiroId;
-    public static final String TAG = RoteirosMapFragment.class.getSimpleName();
     private GoogleMap mMap;
     SupportMapFragment mapFragment;
     LocationManager locManager;
     Location location;
     int proxPonto = 0;
     Map<Integer, Marker> marcadores = new HashMap<>();
-    private static final int INTERVALO_ATUALIZACAO_LOCALIZACAO = 5;
     boolean botaoDeLocalizacaoClicado = false;
     Marker currentMarker = null;
     List<Polyline> rota = new ArrayList<>();
@@ -277,9 +278,17 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
         }
-        location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        botaoDeLocalizacaoClicado = true;
-        new CriarRotaAteRoteiroTask().execute(location);
+        if(locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            botaoDeLocalizacaoClicado = true;
+            new CriarRotaAteRoteiroTask().execute(location);
+        }else if(locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+            location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            botaoDeLocalizacaoClicado = true;
+            new CriarRotaAteRoteiroTask().execute(location);
+        }else{
+            pegarLocalizacao();
+        }
 
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).

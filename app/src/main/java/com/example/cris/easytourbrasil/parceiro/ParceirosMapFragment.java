@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.cris.easytourbrasil.R;
+import com.example.cris.easytourbrasil.roteiro.RoteirosMapFragment;
 import com.example.cris.easytourbrasil.utilitarios.ConversorJson;
 import com.example.cris.easytourbrasil.utilitarios.PolylineUtil;
 import com.example.cris.easytourbrasil.utilitarios.RequisicaoHTTP;
@@ -37,20 +38,24 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback,
         LocationListener, GoogleMap.OnMyLocationButtonClickListener{
 
-    protected JSONObject parceiro;
     public static final String TAG = ParceirosMapFragment.class.getSimpleName();
+    private static final int INTERVALO_ATUALIZACAO_LOCALIZACAO = 5;
+
+    protected JSONObject parceiro;
     private GoogleMap mMap;
     LocationManager locManager;
     Location location;
     Marker currentMarker = null;
     String provider;
     boolean botaoDeLocalizacaoClicado = false;
-    boolean rotaTracada = false;
+    List<Polyline> rota = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,23 +81,57 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
             Toast.makeText(getActivity().getApplicationContext(), "Internet indisponível. Verifique sua conexão.", Toast.LENGTH_LONG).show();
         }
 
-        if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-
-        }
-        if(locManager.getLastKnownLocation(provider) != null)
-            location = locManager.getLastKnownLocation(provider);
-        else
-            locManager.requestLocationUpdates(provider, 0, 0, this);
+        pegarLocalizacao();
 
         return view;
+
+    }
+
+    private void pegarLocalizacao() {
+
+        locManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        boolean gpsDisponivel = locManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        boolean netDisponivel = locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if (!gpsDisponivel && !netDisponivel) {
+            return;
+        } else {
+            if (gpsDisponivel) {
+                if (location == null) {
+                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                    }
+                    locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, INTERVALO_ATUALIZACAO_LOCALIZACAO, this);
+                    Log.d(TAG, "GPS Habilitado");
+                    if (locManager != null) {
+                        location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    }
+                }
+            } else if (netDisponivel) {
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                }
+                locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, INTERVALO_ATUALIZACAO_LOCALIZACAO, this);
+                Log.d(TAG, "Network provider habilitado");
+                if (locManager != null) {
+                    location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                }
+            }
+        }
 
     }
 
@@ -105,27 +144,6 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
 
         return false;
 
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-        }
-        provider = locManager.getBestProvider(new Criteria(), false);
-        if(locManager.getLastKnownLocation(provider) != null)
-            location = locManager.getLastKnownLocation(provider);
-        else
-            locManager.requestLocationUpdates(provider, 0, 5, this);
     }
 
     @Override
@@ -155,7 +173,7 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
         try {
             localParceiro = new LatLng(parceiro.getDouble("latitude"), parceiro.getDouble("longitude"));
             mMap.addMarker(new MarkerOptions().position(localParceiro).title(parceiro.getString("nome_fantasia")));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localParceiro, 15));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localParceiro, 17));
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -179,7 +197,7 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
 
             if (currentMarker==null) {
                 currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localizacao"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 15));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 18));
 
                 if(atualizaDistancia(lat, lng) < 3000){
                     Log.v(TAG, "ta perto");
@@ -222,15 +240,36 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
 
     @Override
     public boolean onMyLocationButtonClick() {
-        botaoDeLocalizacaoClicado = true;
+        Log.v(TAG, "CLICADO");
 
-        //SystemClock.sleep(15000);
-
-        if(!rotaTracada)
+        if (location == null){
+            pegarLocalizacao();
+            if(location == null)
+                return false;
+        }
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+        }
+        if(locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            botaoDeLocalizacaoClicado = true;
             new CriarRotaAteParceiroTask().execute(location);
+        }else if(locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+            location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            botaoDeLocalizacaoClicado = true;
+            new CriarRotaAteParceiroTask().execute(location);
+        }else{
+            pegarLocalizacao();
+        }
+
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).
-
         return false;
     }
 
@@ -248,7 +287,7 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
             try {
                 url= "http://maps.googleapis.com/maps/api/directions/json?origin="
                         + loc.getLatitude() +","+loc.getLongitude()+"&destination="
-                        + parceiro.getDouble("latitude")+","+parceiro.getDouble("longitude")+"&sensor=false";
+                        + parceiro.getDouble("latitude")+","+parceiro.getDouble("longitude")+"&sensor=false$mode=walking";
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -265,14 +304,15 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
         }
         @Override
         protected void onPostExecute(String[] resultDoInBackground){
-            if(!rotaTracada)
                 tracarRota(resultDoInBackground);
         }
     }
 
     private void tracarRota(String[] listaDirecoes) {
 
-        rotaTracada = true;
+        if(rota != null){
+            deletarRota();
+        }
 
         PolylineUtil polylineUtil = new PolylineUtil();
 
@@ -284,9 +324,17 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
                     .width(5)
                     .addAll(polylineUtil.decode(listaDirecoes[i]));
 
-            mMap.addPolyline(options);
+            rota.add(mMap.addPolyline(options));
 
         }
+    }
+
+    private void deletarRota(){
+        for(Polyline line : rota)
+        {
+            line.remove();
+        }
+        rota.clear();
     }
 
 }
