@@ -184,7 +184,12 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
     @Override
     public void onLocationChanged(Location location) {
 
-        if(botaoDeLocalizacaoClicado){
+        if(botaoDeLocalizacaoClicado)
+            marcarUsuarioNoMapa(location);
+    }
+
+
+    private void marcarUsuarioNoMapa(Location location) {
 
             Double lat = location.getLatitude();
             Double lng = location.getLongitude();
@@ -200,17 +205,16 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
                 currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localizacao"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 18));
 
-                if(atualizaDistancia(lat, lng) < 3000){
-                    Log.v(TAG, "ta perto");
+                if(atualizaDistancia(lat, lng) < DISTANCIA_DE_PONTO_METROS){
+                    Log.v(TAG, "Visitou");
                 }
             }
 
             Log.d("Coordenada Lat", lat.toString());
             Log.d("Coordenada Lng", lng.toString());
 
-        }
-
     }
+
 
     private int atualizaDistancia(double lat, double lng){
 
@@ -258,13 +262,19 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
         }
         if(locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+
             location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             botaoDeLocalizacaoClicado = true;
+            marcarUsuarioNoMapa(location);
             new CriarRotaAteParceiroTask().execute(location);
+
         }else if(locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+
             location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             botaoDeLocalizacaoClicado = true;
+            marcarUsuarioNoMapa(location);
             new CriarRotaAteParceiroTask().execute(location);
+
         }else{
             pegarLocalizacao();
         }
@@ -273,7 +283,6 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
         // (the camera animates to the user's current position).
         return false;
     }
-
 
     private class CriarRotaAteParceiroTask extends AsyncTask<Location, Void, String[]> {
 

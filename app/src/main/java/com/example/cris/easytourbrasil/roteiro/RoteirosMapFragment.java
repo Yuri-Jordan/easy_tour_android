@@ -200,37 +200,39 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onLocationChanged(Location location) {
 
-        if (botaoDeLocalizacaoClicado) {
+        if (botaoDeLocalizacaoClicado)
+            marcarUsuarioNoMapa(location);
+    }
 
-            Double lat = location.getLatitude();
-            Double lng = location.getLongitude();
+    private void marcarUsuarioNoMapa(Location location) {
+        Double lat = location.getLatitude();
+        Double lng = location.getLongitude();
 
-            LatLng localizacao = new LatLng(lat, lng);
+        LatLng localizacao = new LatLng(lat, lng);
 
-            if (currentMarker != null) {
-                currentMarker.remove();
-                currentMarker = null;
-            }
-
-            if (currentMarker == null) {
-                currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localizacao"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 18));
-            }
-
-            Log.d("Coordenada Lat", lat.toString());
-            Log.d("Coordenada Lng", lng.toString());
-
-            if (atualizaDistancia(lat, lng) < 100) {
-                Log.v(TAG, "Visitou " + marcadores.get(proxPonto).getTitle());
-
-                marcadores.get(proxPonto).remove();
-                proxPonto++;
-
-                new CriarRotaAteRoteiroTask().execute(location);
-                atualizaDistancia(lat, lng);
-            }
-
+        if (currentMarker != null) {
+            currentMarker.remove();
+            currentMarker = null;
         }
+
+        if (currentMarker == null) {
+            currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localizacao"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 18));
+        }
+
+        Log.d("Coordenada Lat", lat.toString());
+        Log.d("Coordenada Lng", lng.toString());
+
+        if (atualizaDistancia(lat, lng) < DISTANCIA_DE_PONTO_METROS) {
+            Log.v(TAG, "Visitou " + marcadores.get(proxPonto).getTitle());
+
+            marcadores.get(proxPonto).remove();
+            proxPonto++;
+
+            new CriarRotaAteRoteiroTask().execute(location);
+            atualizaDistancia(lat, lng);
+        }
+
     }
 
     private int atualizaDistancia(double lat, double lng) {
@@ -284,10 +286,12 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
         if(locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
             location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             botaoDeLocalizacaoClicado = true;
+            marcarUsuarioNoMapa(location);
             new CriarRotaAteRoteiroTask().execute(location);
         }else if(locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
             location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             botaoDeLocalizacaoClicado = true;
+            marcarUsuarioNoMapa(location);
             new CriarRotaAteRoteiroTask().execute(location);
         }else{
             pegarLocalizacao();
