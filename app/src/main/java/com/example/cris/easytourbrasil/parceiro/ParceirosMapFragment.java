@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cris.easytourbrasil.R;
@@ -28,6 +29,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -36,6 +38,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +49,7 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
 
     public static final String TAG = ParceirosMapFragment.class.getSimpleName();
     private static final int INTERVALO_ATUALIZACAO_LOCALIZACAO = 5;
-    private static final int DISTANCIA_DE_PONTO_METROS = 5;
+    private static final int DISTANCIA_DE_PONTO_METROS = 10;
     private static final String CHAVE_GOOGLE_MAPS = "AIzaSyDcAGiJxsR6ZQWgAgAYZZQLRy_aLhMLiVM";
 
     protected JSONObject parceiro;
@@ -202,7 +205,7 @@ public class ParceirosMapFragment extends Fragment implements OnMapReadyCallback
             }
 
             if (currentMarker==null) {
-                currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localizacao"));
+                currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localização").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 18));
 
                 if(atualizaDistancia(lat, lng) < DISTANCIA_DE_PONTO_METROS){

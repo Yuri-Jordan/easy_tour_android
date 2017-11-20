@@ -136,6 +136,8 @@ public class CategoriaParceirosFragment extends Fragment {
 
             } catch (JSONException e) {
                 Log.e(TAG, "Erro ao logar JsonArray catParceiros: ", e);
+            } catch (NullPointerException ne){
+
             }
         }
     }

@@ -89,7 +89,7 @@ public class CategoriaRoteirosFragment extends Fragment {
                     catRoteirosNome[i] = atributo;
                 }
 
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, catRoteirosNome){
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, catRoteirosNome){
                     @SuppressLint("ResourceAsColor")
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
@@ -127,6 +127,8 @@ public class CategoriaRoteirosFragment extends Fragment {
 
             } catch (JSONException e) {
                 Log.e(TAG, "Erro ao logar JsonArray categoriaRoteiros: ", e);
+            }catch (NullPointerException ne){
+
             }
         }
     }

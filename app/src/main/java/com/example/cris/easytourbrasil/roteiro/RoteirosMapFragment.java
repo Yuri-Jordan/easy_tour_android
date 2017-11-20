@@ -27,6 +27,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -54,8 +55,8 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
         LocationListener, GoogleMap.OnMyLocationButtonClickListener {
 
     public static final String TAG = RoteirosMapFragment.class.getSimpleName();
-    private static final int INTERVALO_ATUALIZACAO_LOCALIZACAO = 5;
-    private static final int DISTANCIA_DE_PONTO_METROS = 5;
+    private static final int INTERVALO_ATUALIZACAO_LOCALIZACAO = 2;
+    private static final int DISTANCIA_DE_PONTO_METROS = 10;
     private static final String CHAVE_GOOGLE_MAPS = "AIzaSyDcAGiJxsR6ZQWgAgAYZZQLRy_aLhMLiVM";
 
 
@@ -216,8 +217,8 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
         }
 
         if (currentMarker == null) {
-            currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localizacao"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 18));
+            currentMarker = mMap.addMarker(new MarkerOptions().position(localizacao).title("Minha localização").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(localizacao, 19));
         }
 
         Log.d("Coordenada Lat", lat.toString());
@@ -225,7 +226,7 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
 
         if (atualizaDistancia(lat, lng) < DISTANCIA_DE_PONTO_METROS) {
             Log.v(TAG, "Visitou " + marcadores.get(proxPonto).getTitle());
-
+            Toast.makeText(getActivity(), "Visitou " + marcadores.get(proxPonto).getTitle(), Toast.LENGTH_LONG).show();
             marcadores.get(proxPonto).remove();
             proxPonto++;
 
@@ -284,6 +285,7 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
             // for ActivityCompat#requestPermissions for more details.
         }
         if(locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            Toast.makeText(getActivity(), "GPS Habilitado", Toast.LENGTH_LONG).show();
             location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             botaoDeLocalizacaoClicado = true;
             marcarUsuarioNoMapa(location);
