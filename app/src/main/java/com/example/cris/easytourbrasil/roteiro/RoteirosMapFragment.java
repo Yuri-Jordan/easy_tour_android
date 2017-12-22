@@ -57,7 +57,7 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
     public static final String TAG = RoteirosMapFragment.class.getSimpleName();
     private static final int INTERVALO_ATUALIZACAO_LOCALIZACAO = 2;
     private static final int DISTANCIA_DE_PONTO_METROS = 10;
-    private static final String CHAVE_GOOGLE_MAPS = "AIzaSyDcAGiJxsR6ZQWgAgAYZZQLRy_aLhMLiVM";
+    private static final String CHAVE_GOOGLE_MAPS = "AIzaSyAxUp4PzPrEoxxC452ngWQriAuzooME8wM";
 
 
     protected JSONArray roteiro;
@@ -372,8 +372,11 @@ public class RoteirosMapFragment extends Fragment implements OnMapReadyCallback,
                 Location loc = locations[0];
 
                 url= "https://maps.googleapis.com/maps/api/directions/json?origin="
-                        + loc.getLatitude() +","+loc.getLongitude()+"&destination="
-                        + ponto.getDouble("latitude")+","+ponto.getDouble("longitude")+"&sensor=false&mode=walking&key="+CHAVE_GOOGLE_MAPS;
+                        + loc.getLatitude() +","+loc.getLongitude()+"&mode=walking&destination="
+                        + ponto.getDouble("latitude")+","+ponto.getDouble("longitude")+"&key="+CHAVE_GOOGLE_MAPS;
+
+
+                Log.v(TAG, "URL :" + url);
 
 
             } catch (JSONException e) {
